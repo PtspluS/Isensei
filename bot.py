@@ -12,7 +12,7 @@ model = load_model('advanced_bot.h5')
 def play(board, available_cells, player):
 
     # taux d'exploration
-    explore_rate = 0.1
+    explore_rate = 0.2
 
     map = np.copy(board).reshape(1,49)
 
