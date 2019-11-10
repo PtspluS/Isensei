@@ -38,7 +38,7 @@ def play(board, available_cells, player):
         return random.choice(available_cells)
     else:
         while not isin(available_cells, max):
-            max = list_proba[len(list_proba)-1-i]
+            max = list_proba[i]
             i += 1
 
         return max
@@ -86,9 +86,9 @@ class Network:
                              bias_initializer='ones'))
             self.model.add(Dense(286, activation='relu', kernel_initializer='random_normal',
                              bias_initializer='ones'))
-            self.model.add(Dense(150, activation='relu', kernel_initializer='random_normal',
+            self.model.add(Dense(150, activation='sigmoid', kernel_initializer='random_normal',
                              bias_initializer='ones'))
-            self.model.add(Dense(49, activation='sigmoid', kernel_initializer='random_normal',
+            self.model.add(Dense(49, activation='softmax', kernel_initializer='random_normal',
                              bias_initializer='ones'))
             self.model.compile(loss='categorical_crossentropy', optimizer=opt, metrics=['accuracy'])
 
