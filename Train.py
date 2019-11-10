@@ -68,22 +68,67 @@ class iSensei(object):
             self.start()
 
             game = 0
-            while game<nb_game:
 
-                # Let the bot play
-                self.play()
+            way = []
+            player1 = []
+            player2 = []
+
+            while game<nb_game:
 
                 map = np.copy(self.board)
                 np.where(map == 2, -1, map)
+
+                way.append(map.reshape(49, ))
+                # Let the bot play
+                self.play()
+
+                # pour savoir ou le gars a joue
+                play = np.copy(self.board)
+                play = ((play-last_turn)/np.amax(play)).reshape((49,))
+
+                # on ajoute l'endroit joue par le joueur dans le tableau correspondant
+                if self.player :
+                    player1.append(play)
+                else:
+                    player2.append(play)
 
                 # Check if there is a winner
                 if self.check_win(self.lastPosition, self.player):
                     print(ai_player_1.name if self.player else ai_player_2.name,
                           "(O)" if self.player else "(X)",
                           "won :")
-                    #self.games.append([last_turn.reshape((1,49)), ((map - last_turn)/np.amax(map)).reshape((1,49))])
-                    self.train.append(last_turn.reshape(49,))
-                    self.target.append(((map - last_turn)/np.amax(map)).reshape(49,))
+                    #self.train.append(last_turn.reshape(49,))
+                    #self.target.append(((map - last_turn)/np.amax(map)).reshape(49,))
+
+                    # si le joueur gagnant est le player 1 alors on enregistre ses coups
+                    if self.player :
+                        if self.firstPlayer :
+                            for p in player1:
+                                self.target.append(p)
+                            for i in range(len(way)):
+                                if i%2==0:
+                                    self.train.append(way[i])
+                        else:
+                            for p in player2:
+                                self.target.append(p)
+                            for i in range(len(way)):
+                                if i%2!=0:
+                                    self.train.append(way[i])
+                    # sinon on enregistre les coups du player 2
+                    else :
+                        if self.firstPlayer:
+                            for p in player1:
+                                self.target.append(p)
+                            for i in range(len(way)):
+                                if i % 2 == 0:
+                                    self.train.append(way[i])
+                        else:
+                            for p in player2:
+                                self.target.append(p)
+                            for i in range(len(way)):
+                                if i % 2 != 0:
+                                    self.train.append(way[i])
+
                     self.playing = False  # Stop playing
 
                 # No winner but no more cells. Find the longest aligned sequence for each player
@@ -91,9 +136,38 @@ class iSensei(object):
                     print("DRAW")
                     print("X: ", self.check_win_by_points(False))
                     print("O: ", self.check_win_by_points(True))
-                    #self.games.append([last_turn.reshape((1,49)), ((map - last_turn)/np.amax(map)).reshape((1,49))])
-                    self.train.append(last_turn.reshape(49,))
-                    self.target.append(((map - last_turn) / np.amax(map)).reshape(49,))
+                    #self.train.append(last_turn.reshape(49,))
+                    #self.target.append(((map - last_turn) / np.amax(map)).reshape(49,))
+
+                    # si le joueur gagnant est le player 1 alors on enregistre ses coups
+                    if self.player:
+                        if self.firstPlayer:
+                            for p in player1:
+                                self.target.append(p)
+                            for i in range(len(way)):
+                                if i % 2 == 0:
+                                    self.train.append(way[i])
+                        else:
+                            for p in player2:
+                                self.target.append(p)
+                            for i in range(len(way)):
+                                if i % 2 != 0:
+                                    self.train.append(way[i])
+                    # sinon on enregistre les coups du player 2
+                    else:
+                        if self.firstPlayer:
+                            for p in player1:
+                                self.target.append(p)
+                            for i in range(len(way)):
+                                if i % 2 == 0:
+                                    self.train.append(way[i])
+                        else:
+                            for p in player2:
+                                self.target.append(p)
+                            for i in range(len(way)):
+                                if i % 2 != 0:
+                                    self.train.append(way[i])
+
                     self.playing = False  # Stop playing
 
                 # Switch player
@@ -106,7 +180,13 @@ class iSensei(object):
                     game += 1
                     self.print_board()
                     time.sleep(.05)  # Wait half second
+
+                    way = []
+                    player1 = []
+                    player2 = []
+
                     self.start()  # Start a new Game
+
 
         except KeyboardInterrupt:
             print("Stopping iSensei...")
@@ -146,6 +226,7 @@ class iSensei(object):
             print()
         print()
         """
+        pass
 
 
     # Check if a player win after a move
@@ -202,7 +283,7 @@ class iSensei(object):
 
 boby = Network(True)
 
-for _ in range(100):
+for _ in range(10):
     ai_player_1 = random.choice(players)
     ai_player_2 = random.choice(players)
 
@@ -223,3 +304,5 @@ for _ in range(100):
         boby.save()
     except:
         print('error')
+
+    print("Match finit (", _, "/100")

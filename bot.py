@@ -1,18 +1,18 @@
 import numpy as np
 from keras.models import Sequential, load_model
 from keras.layers import Dense
-from keras.optimizers import Adam
+from keras.optimizers import Adam, RMSprop, SGD
 import random
 import matplotlib.pyplot as plt
 
-name = "Martin"
+name = "vIAgra"
 
 model = load_model('advanced_bot.h5')
 
 def play(board, available_cells, player):
 
     # taux d'exploration
-    explore_rate = 0.2
+    explore_rate = 0.0
 
     map = np.copy(board).reshape(1,49)
 
@@ -76,9 +76,11 @@ class Network:
     def __init__(self, create = True):
 
         if create :
-            opt = Adam(learning_rate=0.0001, beta_1=0.9, beta_2=0.999, amsgrad=False)
+            opt1 = Adam(learning_rate=0.0001, beta_1=0.9, beta_2=0.999, amsgrad=False)
+            #opt2 = RMSprop(learning_rate=0.001, rho=0.9)
+            #opt3 = SGD(lr=0.01, momentum=0.9)
             self.model = Sequential()
-            self.model.add(Dense(49, activation='tanh', input_dim=49, kernel_initializer='random_normal',
+            self.model.add(Dense(49, activation='relu', input_dim=49, kernel_initializer='random_normal',
                                      bias_initializer='ones'))
             self.model.add(Dense(196, activation='relu', kernel_initializer='random_normal',
                                      bias_initializer='ones'))
@@ -88,9 +90,10 @@ class Network:
                              bias_initializer='ones'))
             self.model.add(Dense(150, activation='sigmoid', kernel_initializer='random_normal',
                              bias_initializer='ones'))
-            self.model.add(Dense(49, activation='softmax', kernel_initializer='random_normal',
+            self.model.add(Dense(49,activation='sigmoid', kernel_initializer='random_normal',
                              bias_initializer='ones'))
-            self.model.compile(loss='categorical_crossentropy', optimizer=opt, metrics=['accuracy'])
+            self.model.compile(loss='binary_crossentropy', optimizer=opt1, metrics=['accuracy'])
+            #self.model.compile(optimizer=opt2, loss='categorical_crossentropy',metrics=['accuracy'])
 
         else:
             self.load()
